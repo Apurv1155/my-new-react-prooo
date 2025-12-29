@@ -1,0 +1,7 @@
+{
+  "name": "Stream & Dream - Premium Men's Wear",
+  "description": "A high-end, animated demo store for men's shirts and T-shirts featuring a full client shopping experience and a robust admin management dashboard with local storage persistence.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

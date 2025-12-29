@@ -1,0 +1,629 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stream & Dream | Premium Men's Wear</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.75); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .product-card:hover .quick-view-btn { transform: translateY(0); opacity: 1; }
+        .quick-view-btn { transform: translateY(1rem); opacity: 0; transition: all 0.3s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .animate-fade-in { animation: fadeIn 0.5s ease forwards; }
+    </style>
+</head>
+<body class="bg-gray-50 text-slate-900 selection:bg-black selection:text-white">
+
+    <div id="app-root"></div>
+
+    <!-- View Switcher (Fixed Bottom) -->
+    <div class="fixed bottom-6 right-6 z-[9999]">
+        <button id="view-switcher-btn" class="bg-black text-white px-6 py-3 rounded-full shadow-2xl font-semibold flex items-center gap-2 hover:scale-105 transition-transform active:scale-95">
+            <span id="switcher-text">Switch to Admin</span>
+        </button>
+    </div>
+
+    <script>
+        // --- CONSTANTS & INITIAL DATA ---
+        const INITIAL_PRODUCTS = [
+            {
+                id: '1',
+                name: 'Ghost White Linen Shirt',
+                description: 'Bespoke fit linen shirt with a subtle waffle texture. Perfect for high-end coastal living and evening gallas.',
+                price: 3499,
+                originalPrice: 4999,
+                category: 'Shirt',
+                sizes: ['M', 'L', 'XL'],
+                images: [
+                    'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80&w=800', 
+                    'https://images.unsplash.com/photo-1621072156002-e2fcced0b170?auto=format&fit=crop&q=80&w=800', 
+                    'https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?auto=format&fit=crop&q=80&w=800', 
+                    'https://images.unsplash.com/photo-1598033129183-c4f50c717658?auto=format&fit=crop&q=80&w=800'
+                ],
+                stock: 25,
+                offerTitle: 'Premium Choice'
+            },
+            {
+                id: '2',
+                name: 'Obsidian Oversized Tee',
+                description: '300GSM heavy cotton oversized tee with drop shoulder silhouette. The ultimate streetwear essential.',
+                price: 1599,
+                originalPrice: 1999,
+                category: 'T-Shirt',
+                sizes: ['S', 'M', 'L', 'XL'],
+                images: [
+                    'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?auto=format&fit=crop&q=80&w=800', 
+                    'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&q=80&w=800', 
+                    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=800', 
+                    'https://images.unsplash.com/photo-1503341455253-b2e723bb3dbb?auto=format&fit=crop&q=80&w=800'
+                ],
+                stock: 40,
+                offerTitle: 'Best Seller'
+            },
+            {
+                id: '3',
+                name: 'Sahara Sand Cuban Collar',
+                description: 'Retro-inspired sand-colored shirt with a relaxed Cuban collar and breathable weave.',
+                price: 2899,
+                category: 'Shirt',
+                sizes: ['M', 'L', 'XL'],
+                images: [
+                    'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?auto=format&fit=crop&q=80&w=800',
+                    'https://images.unsplash.com/photo-1586363104862-3a5e2ab60d99?auto=format&fit=crop&q=80&w=800'
+                ],
+                stock: 15
+            },
+            {
+                id: '4',
+                name: 'Electric Cobalt Tee',
+                description: 'Vibrant cobalt blue tee in a slim athletic fit. Moisture-wicking technology for the modern athlete.',
+                price: 1299,
+                originalPrice: 1599,
+                category: 'T-Shirt',
+                sizes: ['S', 'M', 'L'],
+                images: [
+                    'https://images.unsplash.com/photo-1562157873-818bc0726f68?auto=format&fit=crop&q=80&w=800',
+                    'https://images.unsplash.com/photo-1574180563860-563b0bb1a5ee?auto=format&fit=crop&q=80&w=800'
+                ],
+                stock: 50,
+                offerTitle: 'Flash Sale'
+            }
+        ];
+
+        const CLIENT_USER = {
+            name: 'Apurv Vala',
+            email: 'nextge.bywala@gmail.com',
+            phone: '+91123456789',
+            address: 'c-15 maruti 2 singarva ahmedabad 382430'
+        };
+
+        const INITIAL_REVIEWS = [
+            {
+                id: 'rev-1',
+                productId: '1',
+                productName: 'Ghost White Linen Shirt',
+                productImg: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80&w=800',
+                userName: CLIENT_USER.name,
+                rating: 5,
+                comment: 'The fit is absolutely divine. I wore this to a beach wedding and received so many compliments.',
+                images: ['https://images.unsplash.com/photo-1621072156002-e2fcced0b170?auto=format&fit=crop&q=80&w=400'],
+                approved: true,
+                date: '01/12/2023'
+            }
+        ];
+
+        const OrderStatus = {
+            ORDERED: 'Ordered',
+            CONFIRMED: 'Confirmed',
+            SHIPPED: 'Shipped',
+            OUT_FOR_DELIVERY: 'Out for Delivery',
+            DELIVERED: 'Delivered'
+        };
+
+        // --- STATE MANAGEMENT ---
+        let state = {
+            viewMode: 'CLIENT',
+            activeTab: 'SHOP', // SHOP, PROFILE, CART for client | STOCK, ORDERS, OFFERS, REVIEWS for admin
+            products: JSON.parse(localStorage.getItem('sd_products')) || INITIAL_PRODUCTS,
+            orders: JSON.parse(localStorage.getItem('sd_orders')) || [],
+            reviews: JSON.parse(localStorage.getItem('sd_reviews')) || INITIAL_REVIEWS,
+            cart: JSON.parse(localStorage.getItem('sd_cart')) || [],
+            selectedProductId: null,
+            detailActiveSize: null,
+            detailActiveImage: null,
+            searchQuery: '',
+            filterCategory: 'ALL'
+        };
+
+        function updateState(updates) {
+            state = { ...state, ...updates };
+            // Auto-persistence
+            localStorage.setItem('sd_products', JSON.stringify(state.products));
+            localStorage.setItem('sd_orders', JSON.stringify(state.orders));
+            localStorage.setItem('sd_reviews', JSON.stringify(state.reviews));
+            localStorage.setItem('sd_cart', JSON.stringify(state.cart));
+            render();
+        }
+
+        // --- HELPER FUNCTIONS ---
+        function getCartTotal() {
+            return state.cart.reduce((acc, item) => {
+                const product = state.products.find(p => p.id === item.productId);
+                return acc + (product ? product.price * item.quantity : 0);
+            }, 0);
+        }
+
+        function getStatusProgress(status) {
+            const stages = [OrderStatus.ORDERED, OrderStatus.CONFIRMED, OrderStatus.SHIPPED, OrderStatus.OUT_FOR_DELIVERY, OrderStatus.DELIVERED];
+            const index = stages.indexOf(status);
+            return ((index + 1) / stages.length) * 100;
+        }
+
+        // --- RENDER FUNCTIONS ---
+        function render() {
+            const root = document.getElementById('app-root');
+            const switcherText = document.getElementById('switcher-text');
+            switcherText.textContent = state.viewMode === 'CLIENT' ? 'Switch to Admin' : 'Switch to Store';
+
+            if (state.viewMode === 'CLIENT') {
+                root.innerHTML = renderClient();
+            } else {
+                root.innerHTML = renderAdmin();
+            }
+
+            // After render, attach all event listeners
+            attachEventListeners();
+        }
+
+        function renderClient() {
+            return `
+                <div class="pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in">
+                    ${renderNavbar()}
+                    ${state.selectedProductId && state.activeTab === 'SHOP' ? renderProductDetail() : ''}
+                    ${state.activeTab === 'SHOP' ? renderShop() : ''}
+                    ${state.activeTab === 'PROFILE' ? renderProfile() : ''}
+                    ${state.activeTab === 'CART' ? renderCart() : ''}
+                </div>
+            `;
+        }
+
+        function renderNavbar() {
+            return `
+                <nav class="sticky top-0 z-[60] py-6 glass flex items-center justify-between border-b border-gray-100 mb-8 px-6 rounded-b-3xl shadow-sm">
+                    <div class="cursor-pointer flex items-center gap-2" onclick="updateState({ activeTab: 'SHOP', selectedProductId: null })">
+                        <div class="w-10 h-10 bg-black rounded-xl flex items-center justify-center rotate-3">
+                            <span class="text-white text-sm font-black tracking-widest">SD</span>
+                        </div>
+                        <h1 class="text-2xl font-black tracking-tighter text-black uppercase italic">Stream & Dream</h1>
+                    </div>
+                    <div class="flex gap-8 items-center">
+                        <button onclick="updateState({ activeTab: 'SHOP', selectedProductId: null })" class="text-sm font-bold uppercase tracking-widest ${state.activeTab === 'SHOP' ? 'text-black' : 'text-gray-400'}">Explore</button>
+                        <button onclick="updateState({ activeTab: 'PROFILE', selectedProductId: null })" class="text-sm font-bold uppercase tracking-widest ${state.activeTab === 'PROFILE' ? 'text-black' : 'text-gray-400'}">Profile</button>
+                        <button onclick="updateState({ activeTab: 'CART', selectedProductId: null })" class="relative group p-2 bg-gray-50 rounded-full hover:bg-black hover:text-white transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M16 11V7a4 4 0 118 0m-8 4v2m0 6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+                            ${state.cart.length > 0 ? `<span class="absolute -top-1 -right-1 bg-red-500 text-white text-[9px] w-5 h-5 rounded-full flex items-center justify-center font-black border-2 border-white">${state.cart.length}</span>` : ''}
+                        </button>
+                    </div>
+                </nav>
+            `;
+        }
+
+        function renderShop() {
+            const filtered = state.products.filter(p => {
+                const matchesSearch = p.name.toLowerCase().includes(state.searchQuery.toLowerCase());
+                const matchesCategory = state.filterCategory === 'ALL' || p.category === state.filterCategory;
+                return matchesSearch && matchesCategory;
+            });
+
+            return `
+                <div class="mb-12">
+                    <!-- Hero -->
+                    <div class="bg-gradient-to-br from-slate-950 via-slate-900 to-indigo-950 text-white rounded-[3rem] p-12 mb-12 relative overflow-hidden shadow-2xl">
+                        <div class="relative z-10 max-w-lg">
+                            <div class="inline-block bg-white/10 backdrop-blur-md px-4 py-1 rounded-full text-[10px] font-black uppercase tracking-[0.3em] mb-6 border border-white/20">Summer 2024 Collection</div>
+                            <h2 class="text-7xl font-black mb-6 uppercase italic tracking-tighter leading-none">A New Era <br/><span class="text-indigo-400">Of Style</span></h2>
+                            <p class="text-slate-400 text-lg mb-10 leading-relaxed font-medium">Redefining masculinity through minimalist design. Discover the essence of Dreamwear.</p>
+                            <button class="bg-white text-black px-10 py-4 rounded-2xl font-black uppercase tracking-widest hover:scale-105 transition-transform shadow-xl">Shop The Drop</button>
+                        </div>
+                        <div class="absolute -right-20 -bottom-20 w-2/3 h-[120%] bg-cover opacity-60 mix-blend-overlay rotate-6 translate-x-12" style="background-image: url('https://images.unsplash.com/photo-1596755094514-f87e34085b2c?auto=format&fit=crop&q=80&w=800')"></div>
+                    </div>
+
+                    <!-- Search & Filter -->
+                    <div class="flex flex-col md:flex-row gap-6 mb-12">
+                        <div class="relative flex-1 group">
+                            <input id="search-input" type="text" placeholder="Find your vibe..." value="${state.searchQuery}" class="w-full pl-16 pr-8 py-6 rounded-3xl border border-gray-100 bg-white focus:ring-4 focus:ring-indigo-50 outline-none transition-all shadow-xl placeholder:text-gray-300 font-bold" />
+                            <svg class="absolute left-6 top-1/2 -translate-y-1/2 text-gray-400" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                        </div>
+                        <div class="flex gap-2 p-2 bg-white rounded-3xl shadow-xl border border-gray-50">
+                            ${['ALL', 'Shirt', 'T-Shirt'].map(cat => `
+                                <button onclick="updateState({ filterCategory: '${cat}' })" class="px-10 py-4 rounded-2xl text-xs font-black uppercase tracking-widest transition-all ${state.filterCategory === cat ? 'bg-black shadow-lg text-white scale-105' : 'text-gray-400 hover:text-gray-600'}">${cat}</button>
+                            `).join('')}
+                        </div>
+                    </div>
+
+                    <!-- Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-12">
+                        ${filtered.map(product => `
+                            <div class="group cursor-pointer relative product-card" onclick="updateState({ selectedProductId: '${product.id}', detailActiveImage: '${product.images[0]}', detailActiveSize: '${product.sizes[0]}' })">
+                                <div class="aspect-[3/4] rounded-[2rem] overflow-hidden bg-gray-50 relative shadow-md transition-all duration-700 group-hover:shadow-2xl group-hover:-translate-y-3">
+                                    <img src="${product.images[0]}" class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110" />
+                                    ${product.offerTitle ? `<div class="absolute top-6 left-6 bg-red-500 text-white text-[9px] font-black px-4 py-1.5 rounded-full uppercase tracking-[0.2em] shadow-xl animate-pulse">${product.offerTitle}</div>` : ''}
+                                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500 flex flex-col justify-end p-8">
+                                        <button class="quick-view-btn bg-white text-black py-4 rounded-2xl font-black uppercase tracking-widest text-xs shadow-2xl">Quick View</button>
+                                    </div>
+                                </div>
+                                <div class="mt-6">
+                                    <h3 class="font-black text-gray-900 uppercase tracking-tighter text-xl italic leading-tight group-hover:text-indigo-600 transition-colors truncate">${product.name}</h3>
+                                    <div class="flex items-center gap-3 mt-2">
+                                        <span class="font-black text-2xl tracking-tighter">₹${product.price}</span>
+                                        ${product.originalPrice ? `<span class="text-sm text-gray-300 line-through font-bold italic">₹${product.originalPrice}</span>` : ''}
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProductDetail() {
+            const product = state.products.find(p => p.id === state.selectedProductId);
+            const reviews = state.reviews.filter(r => r.productId === product.id && r.approved);
+            const suggested = state.products.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+
+            return `
+                <div class="fixed inset-0 z-[70] bg-white overflow-y-auto animate-fade-in">
+                    <div class="max-w-7xl mx-auto px-4 py-8 relative">
+                        <button onclick="updateState({ selectedProductId: null })" class="fixed top-8 left-8 z-[80] bg-black text-white p-4 rounded-full shadow-2xl hover:scale-110 active:scale-95 transition-all">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="3"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                        </button>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-16">
+                            <!-- Gallery -->
+                            <div class="space-y-4">
+                                <div class="aspect-[3/4] rounded-[2.5rem] overflow-hidden bg-gray-50 border border-gray-100 shadow-inner">
+                                    <img src="${state.detailActiveImage || product.images[0]}" class="w-full h-full object-cover" />
+                                </div>
+                                <div class="flex gap-4 overflow-x-auto hide-scrollbar py-2">
+                                    ${product.images.map(img => `
+                                        <button onclick="updateState({ detailActiveImage: '${img}' })" class="flex-shrink-0 w-24 h-32 rounded-2xl overflow-hidden border-2 transition-all ${state.detailActiveImage === img ? 'border-black scale-105 shadow-lg' : 'border-transparent opacity-60'}">
+                                            <img src="${img}" class="w-full h-full object-cover" />
+                                        </button>
+                                    `).join('')}
+                                </div>
+                            </div>
+
+                            <!-- Info -->
+                            <div>
+                                <span class="text-xs font-black uppercase tracking-[0.3em] text-indigo-500 bg-indigo-50 px-4 py-1 rounded-full">${product.category}</span>
+                                <h2 class="text-5xl font-black mt-4 text-gray-900 leading-tight uppercase italic">${product.name}</h2>
+                                <div class="flex items-center gap-4 mt-6">
+                                    <span class="text-4xl font-black text-black">₹${product.price}</span>
+                                    ${product.originalPrice ? `<span class="text-xl text-gray-300 line-through font-bold italic">₹${product.originalPrice}</span>` : ''}
+                                </div>
+
+                                <div class="mt-10">
+                                    <h4 class="text-sm font-black uppercase tracking-widest text-gray-400 mb-6 flex items-center gap-2">Select Size <span class="h-px flex-1 bg-gray-100"></span></h4>
+                                    <div class="flex gap-4 flex-wrap">
+                                        ${product.sizes.map(size => `
+                                            <button onclick="updateState({ detailActiveSize: '${size}' })" class="w-16 h-16 rounded-2xl font-black transition-all flex items-center justify-center border-2 ${state.detailActiveSize === size ? 'bg-black border-black text-white shadow-2xl scale-110' : 'bg-white border-gray-100 text-gray-400'}">${size}</button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+
+                                <button onclick="addToCart('${product.id}', '${state.detailActiveSize}')" class="w-full bg-black text-white py-6 rounded-3xl text-xl font-black uppercase tracking-widest shadow-2xl mt-12 hover:scale-[1.02] active:scale-95 transition-all">Add To Bag</button>
+                                <p class="text-gray-500 leading-relaxed text-lg mt-8 pt-8 border-t border-gray-100">${product.description}</p>
+                            </div>
+                        </div>
+
+                        <!-- Community Feedback -->
+                        <section class="mt-24">
+                            <h3 class="text-3xl font-black uppercase italic mb-12 flex items-center gap-4">Community Feedback <span class="h-px flex-1 bg-gray-100"></span></h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                ${reviews.map(rev => `
+                                    <div class="bg-gray-50 p-8 rounded-[2rem] border border-gray-100">
+                                        <h5 class="font-bold">${rev.userName}</h5>
+                                        <p class="text-gray-600 italic mt-4 leading-relaxed">"${rev.comment}"</p>
+                                    </div>
+                                `).join('')}
+                                ${reviews.length === 0 ? '<p class="text-gray-400">No reviews yet.</p>' : ''}
+                            </div>
+                        </section>
+
+                        <!-- Recommended -->
+                        <section class="mt-24 pb-20">
+                            <h3 class="text-3xl font-black uppercase italic mb-12">Recommended For You</h3>
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+                                ${suggested.map(p => `
+                                    <div onclick="updateState({ selectedProductId: '${p.id}', detailActiveImage: '${p.images[0]}', detailActiveSize: '${p.sizes[0]}' })" class="group cursor-pointer">
+                                        <div class="aspect-[3/4] rounded-3xl overflow-hidden bg-gray-100 relative shadow-sm transition-transform group-hover:-translate-y-2">
+                                            <img src="${p.images[0]}" class="w-full h-full object-cover" />
+                                        </div>
+                                        <h5 class="font-bold mt-4 text-sm truncate uppercase tracking-tighter">${p.name}</h5>
+                                        <p class="font-black text-lg">₹${p.price}</p>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </section>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderProfile() {
+            return `
+                <div class="max-w-4xl mx-auto">
+                    <div class="bg-white rounded-[3rem] p-12 shadow-2xl mb-12 flex items-center gap-10">
+                        <div class="w-32 h-32 bg-black rounded-[2.5rem] flex items-center justify-center text-white text-4xl font-black shadow-2xl">AV</div>
+                        <div>
+                            <h2 class="text-4xl font-black uppercase italic tracking-tighter">${CLIENT_USER.name}</h2>
+                            <p class="text-gray-400 font-bold text-sm mt-1">${CLIENT_USER.email} • ${CLIENT_USER.phone}</p>
+                        </div>
+                    </div>
+                    <h3 class="text-2xl font-black mb-8 uppercase italic flex items-center gap-4">Order History <span class="h-px flex-1 bg-gray-100"></span></h3>
+                    <div class="space-y-8">
+                        ${state.orders.map(order => `
+                            <div class="bg-white rounded-[2.5rem] p-8 shadow-xl border border-gray-50">
+                                <div class="flex justify-between items-start mb-6">
+                                    <div>
+                                        <span class="text-[10px] font-black uppercase tracking-widest text-indigo-500 bg-indigo-50 px-3 py-1 rounded-lg">ID: ${order.id}</span>
+                                        <h4 class="font-black text-xl mt-2 italic">${order.date}</h4>
+                                    </div>
+                                    <p class="font-black text-3xl tracking-tighter">₹${order.total}</p>
+                                </div>
+                                <div class="h-2 bg-gray-100 rounded-full mb-12">
+                                    <div class="h-full bg-black rounded-full" style="width: ${getStatusProgress(order.status)}%"></div>
+                                </div>
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    ${order.items.map(item => `
+                                        <div class="flex gap-6 items-center p-4 bg-gray-50 rounded-3xl">
+                                            <img src="${item.img}" class="w-20 h-24 rounded-2xl object-cover shadow-lg" />
+                                            <div>
+                                                <h5 class="text-sm font-black uppercase italic truncate w-40">${item.name}</h5>
+                                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">SZ: ${item.size} • Qty: ${item.quantity}</p>
+                                            </div>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `).join('')}
+                        ${state.orders.length === 0 ? '<p class="text-center text-gray-400 py-10">You haven\'t ordered anything yet.</p>' : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderCart() {
+            const total = getCartTotal();
+            return `
+                <div class="max-w-3xl mx-auto">
+                    <h2 class="text-5xl font-black mb-12 uppercase italic tracking-tighter">My Bag</h2>
+                    ${state.cart.length === 0 ? `
+                        <div class="bg-white rounded-[3rem] p-20 text-center shadow-2xl">
+                            <p class="text-gray-400 text-xl font-medium">Your fashion voyage is just beginning...</p>
+                            <button onclick="updateState({ activeTab: 'SHOP' })" class="bg-black text-white px-12 py-5 rounded-2xl font-black uppercase tracking-widest shadow-2xl mt-10">Explore Trends</button>
+                        </div>
+                    ` : `
+                        <div class="space-y-8">
+                            ${state.cart.map((item, idx) => {
+                                const product = state.products.find(p => p.id === item.productId);
+                                return `
+                                    <div class="bg-white rounded-[2.5rem] p-8 shadow-xl flex flex-col md:flex-row gap-8 relative overflow-hidden">
+                                        <img src="${product.images[0]}" class="w-full md:w-32 h-44 rounded-3xl object-cover shadow-2xl" />
+                                        <div class="flex-1 flex flex-col justify-between">
+                                            <div class="flex justify-between items-start">
+                                                <h4 class="font-black text-2xl italic uppercase tracking-tighter">${product.name}</h4>
+                                                <button onclick="removeFromCart(${idx})" class="text-gray-200 hover:text-red-500"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2.5"><path d="M6 18L18 6M6 6l12 12" /></svg></button>
+                                            </div>
+                                            <div class="flex gap-4 mt-3">
+                                                <span class="text-[10px] font-black uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-lg">Size: ${item.size}</span>
+                                                <span class="text-[10px] font-black uppercase tracking-widest bg-gray-50 px-3 py-1 rounded-lg">Qty: ${item.quantity}</span>
+                                            </div>
+                                            <span class="font-black text-3xl tracking-tighter mt-6">₹${product.price}</span>
+                                        </div>
+                                    </div>
+                                `;
+                            }).join('')}
+                            <div class="bg-white rounded-[3rem] p-10 shadow-2xl border-t-8 border-black">
+                                <div class="flex justify-between text-4xl font-black italic tracking-tighter mb-10"><span>Total</span><span>₹${total}</span></div>
+                                <button onclick="placeOrder()" class="w-full bg-black text-white py-7 rounded-[2rem] text-xl font-black uppercase tracking-[0.3em] shadow-2xl">Confirm (COD)</button>
+                            </div>
+                        </div>
+                    `}
+                </div>
+            `;
+        }
+
+        // --- ADMIN RENDERING ---
+        function renderAdmin() {
+            return `
+                <div class="pb-24 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 animate-fade-in">
+                    <nav class="sticky top-0 z-50 py-6 glass flex items-center justify-between border-b border-gray-100 mb-8 px-6 rounded-b-3xl shadow-sm">
+                        <h1 class="text-2xl font-black tracking-tighter text-black flex items-center gap-2">
+                            <div class="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center"><span class="text-white text-xs font-black">AD</span></div>
+                            SD Admin Panel
+                        </h1>
+                        <div class="flex gap-4 md:gap-8 overflow-x-auto hide-scrollbar">
+                            <button onclick="updateState({ activeTab: 'STOCK' })" class="text-sm font-bold px-3 py-2 rounded-xl ${state.activeTab === 'STOCK' ? 'bg-black text-white' : 'text-gray-500'}">Stock</button>
+                            <button onclick="updateState({ activeTab: 'ORDERS' })" class="text-sm font-bold px-3 py-2 rounded-xl ${state.activeTab === 'ORDERS' ? 'bg-black text-white' : 'text-gray-500'}">Orders</button>
+                            <button onclick="updateState({ activeTab: 'REVIEWS' })" class="text-sm font-bold px-3 py-2 rounded-xl ${state.activeTab === 'REVIEWS' ? 'bg-black text-white' : 'text-gray-500'}">Reviews</button>
+                        </div>
+                    </nav>
+
+                    ${state.activeTab === 'STOCK' ? renderAdminStock() : ''}
+                    ${state.activeTab === 'ORDERS' ? renderAdminOrders() : ''}
+                    ${state.activeTab === 'REVIEWS' ? renderAdminReviews() : ''}
+                </div>
+            `;
+        }
+
+        function renderAdminStock() {
+            return `
+                <div class="flex justify-between items-center mb-8">
+                    <h3 class="text-2xl font-black italic uppercase">Inventory</h3>
+                    <button onclick="addRandomProduct()" class="bg-black text-white px-6 py-3 rounded-2xl font-bold">Add Random Stock</button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    ${state.products.map(p => `
+                        <div class="bg-white p-5 rounded-3xl shadow-sm border border-gray-100 flex gap-4">
+                            <img src="${p.images[0]}" class="w-24 h-32 rounded-2xl object-cover shadow-md" />
+                            <div class="flex-1 flex flex-col justify-between">
+                                <div><h4 class="font-bold text-lg">${p.name}</h4><p class="text-xs text-gray-400">${p.category}</p></div>
+                                <div class="flex justify-between items-end">
+                                    <p class="text-lg font-black ${p.stock < 10 ? 'text-red-500' : 'text-black'}">${p.stock} pcs</p>
+                                    <button onclick="deleteProduct('${p.id}')" class="p-2 bg-red-50 text-red-500 rounded-xl hover:bg-red-500 hover:text-white transition-all">Delete</button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function renderAdminOrders() {
+            return `
+                <h3 class="text-2xl font-black italic uppercase mb-8">Fulfillment Dashboard</h3>
+                <div class="space-y-6">
+                    ${state.orders.map(order => `
+                        <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-gray-100 flex flex-col lg:flex-row gap-8">
+                            <div class="flex-1">
+                                <div class="flex justify-between mb-6">
+                                    <div><h4 class="text-xl font-bold">${order.customerName}</h4><p class="text-sm text-gray-500">${order.id}</p></div>
+                                    <p class="text-2xl font-black">₹${order.total}</p>
+                                </div>
+                                <div class="flex gap-4">
+                                    ${order.items.map(i => `<img src="${i.img}" class="w-10 h-10 rounded-lg object-cover" />`).join('')}
+                                </div>
+                            </div>
+                            <div class="lg:w-80 space-y-4">
+                                <select onchange="updateOrderStatus('${order.id}', this.value)" class="w-full bg-gray-50 border border-gray-100 px-4 py-3 rounded-xl font-bold">
+                                    ${Object.values(OrderStatus).map(s => `<option value="${s}" ${order.status === s ? 'selected' : ''}>${s}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+                    `).join('')}
+                    ${state.orders.length === 0 ? '<p class="text-gray-400">No orders yet.</p>' : ''}
+                </div>
+            `;
+        }
+
+        function renderAdminReviews() {
+            return `
+                <h3 class="text-2xl font-black italic uppercase mb-8">Moderation</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    ${state.reviews.map(rev => `
+                        <div class="bg-white rounded-3xl p-6 shadow-sm border ${rev.approved ? 'border-green-100' : 'border-amber-100'}">
+                            <h5 class="font-bold">${rev.productName}</h5>
+                            <p class="text-sm text-gray-600 mt-4 leading-relaxed">"${rev.comment}"</p>
+                            <div class="flex gap-3 mt-6">
+                                ${!rev.approved ? `<button onclick="approveReview('${rev.id}')" class="flex-1 bg-green-500 text-white py-3 rounded-2xl font-bold">Approve</button>` : ''}
+                                <button onclick="deleteReview('${rev.id}')" class="flex-1 bg-red-50 text-red-500 py-3 rounded-2xl font-bold">Delete</button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        // --- LOGIC FUNCTIONS ---
+        function attachEventListeners() {
+            const searchInput = document.getElementById('search-input');
+            if (searchInput) {
+                searchInput.addEventListener('input', (e) => {
+                    // Update state without full render to keep focus, then partial update or full after debounce
+                    state.searchQuery = e.target.value;
+                });
+                searchInput.addEventListener('change', () => { render(); });
+            }
+
+            document.getElementById('view-switcher-btn').onclick = () => {
+                updateState({ 
+                    viewMode: state.viewMode === 'CLIENT' ? 'ADMIN' : 'CLIENT',
+                    activeTab: state.viewMode === 'CLIENT' ? 'STOCK' : 'SHOP' 
+                });
+            };
+        }
+
+        function addToCart(productId, size) {
+            if (!size || size === 'null') {
+                alert('Please select a size first');
+                return;
+            }
+            const existing = state.cart.find(item => item.productId === productId && item.size === size);
+            let newCart;
+            if (existing) {
+                newCart = state.cart.map(item => item.productId === productId && item.size === size ? { ...item, quantity: item.quantity + 1 } : item);
+            } else {
+                newCart = [...state.cart, { productId, quantity: 1, size }];
+            }
+            updateState({ cart: newCart });
+            alert('Bag updated!');
+        }
+
+        function removeFromCart(idx) {
+            const newCart = state.cart.filter((_, i) => i !== idx);
+            updateState({ cart: newCart });
+        }
+
+        function placeOrder() {
+            const newOrder = {
+                id: `ORD-${Math.floor(Math.random() * 90000) + 10000}`,
+                items: state.cart.map(c => {
+                    const p = state.products.find(x => x.id === c.productId);
+                    return { productId: c.productId, quantity: c.quantity, size: c.size, priceAtOrder: p.price, name: p.name, img: p.images[0] };
+                }),
+                total: getCartTotal(),
+                status: OrderStatus.ORDERED,
+                customerName: CLIENT_USER.name,
+                email: CLIENT_USER.email,
+                phone: CLIENT_USER.phone,
+                address: CLIENT_USER.address,
+                date: new Date().toLocaleDateString()
+            };
+            updateState({ orders: [newOrder, ...state.orders], cart: [], activeTab: 'PROFILE' });
+            alert('Order placed successfully (COD)!');
+        }
+
+        function addRandomProduct() {
+            const id = Math.random().toString(36).substr(2, 9);
+            const p = {
+                id,
+                name: 'New Arrivals Tee ' + id.substr(0, 3),
+                description: 'A newly added trending item.',
+                price: 999,
+                category: 'T-Shirt',
+                sizes: ['M', 'L'],
+                images: ['https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&q=80&w=800'],
+                stock: 20
+            };
+            updateState({ products: [p, ...state.products] });
+        }
+
+        function deleteProduct(id) {
+            updateState({ products: state.products.filter(p => p.id !== id) });
+        }
+
+        function updateOrderStatus(id, status) {
+            updateState({ orders: state.orders.map(o => o.id === id ? { ...o, status } : o) });
+        }
+
+        function approveReview(id) {
+            updateState({ reviews: state.reviews.map(r => r.id === id ? { ...r, approved: true } : r) });
+        }
+
+        function deleteReview(id) {
+            updateState({ reviews: state.reviews.filter(r => r.id !== id) });
+        }
+
+        // Initialize first render
+        render();
+
+    </script>
+</body>
+</html>
